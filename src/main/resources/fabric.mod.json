@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "keep_inventory_nerf",
+  "version": "${version}",
+  "name": "Keep Inventory Nerf",
+  "description": "When dying, you will lose 1 random item from your inventory.",
+  "authors": [
+    "uhmbyee / Mariany Pinkston"
+  ],
+  "contact": {
+    "homepage": "https://www.mariany.dev/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "ARR",
+  "icon": "assets/keep_inventory_nerf/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.mariany.KeepInventoryNerf"
+    ],
+    "fabric-datagen": [
+      "dev.mariany.KeepInventoryNerfDataGenerator"
+    ]
+  },
+  "mixins": [
+    "keep_inventory_nerf.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.13",
+    "minecraft": "~1.21.5",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
