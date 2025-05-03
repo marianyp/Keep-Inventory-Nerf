@@ -1,6 +1,6 @@
-package dev.mariany.tag;
+package dev.mariany.keep_inventory_nerf.tag;
 
-import dev.mariany.KeepInventoryNerf;
+import dev.mariany.keep_inventory_nerf.KeepInventoryNerf;
 import net.minecraft.item.Item;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;

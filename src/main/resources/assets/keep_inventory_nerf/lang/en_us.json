@@ -1,3 +1,7 @@
 {
-  "death.keep_inventory_nerf.dropped_items": "You lost items at %s"
+  "death.keep_inventory_nerf.dropped_items": "You lost items at %s",
+  "gamerule.keepInventoryMinItemsToDrop": "Minimum items to drop on death",
+  "gamerule.keepInventoryMaxItemsToDrop": "Maximum items to drop on death",
+  "gamerule.keepInventoryMinItemsToDrop.description": "When Keep Inventory is enabled, this value will control the minimum amount of random items to drop from the player's inventory.",
+  "gamerule.keepInventoryMaxItemsToDrop.description": "When Keep Inventory is enabled, this value will control the maximum amount of random items to drop from the player's inventory."
 }

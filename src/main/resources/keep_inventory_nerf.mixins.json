@@ -1,8 +1,9 @@
 {
   "required": true,
-  "package": "dev.mariany.mixin",
+  "package": "dev.mariany.keep_inventory_nerf.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "GameRulesMixin",
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin"
   ],

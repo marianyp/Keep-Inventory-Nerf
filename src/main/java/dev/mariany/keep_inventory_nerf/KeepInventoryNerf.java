@@ -1,6 +1,6 @@
-package dev.mariany;
+package dev.mariany.keep_inventory_nerf;
 
-import dev.mariany.gamerule.KeepInventoryNerfGamerules;
+import dev.mariany.keep_inventory_nerf.gamerule.KeepInventoryNerfGamerules;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.util.Identifier;

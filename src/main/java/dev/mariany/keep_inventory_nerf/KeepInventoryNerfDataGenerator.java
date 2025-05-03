@@ -1,6 +1,6 @@
-package dev.mariany;
+package dev.mariany.keep_inventory_nerf;
 
-import dev.mariany.datagen.KeepInventoryNerfItemTagProvider;
+import dev.mariany.keep_inventory_nerf.datagen.KeepInventoryNerfItemTagProvider;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 

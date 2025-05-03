@@ -1,6 +1,6 @@
-package dev.mariany;
+package dev.mariany.keep_inventory_nerf;
 
-import dev.mariany.tag.KeepInventoryNerfTags;
+import dev.mariany.keep_inventory_nerf.tag.KeepInventoryNerfTags;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;

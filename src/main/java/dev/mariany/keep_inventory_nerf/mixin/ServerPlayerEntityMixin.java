@@ -1,6 +1,6 @@
-package dev.mariany.mixin;
+package dev.mariany.keep_inventory_nerf.mixin;
 
-import dev.mariany.KeepInventoryNerfHelper;
+import dev.mariany.keep_inventory_nerf.KeepInventoryNerfHelper;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Mixin;

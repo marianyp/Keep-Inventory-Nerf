@@ -1,8 +1,9 @@
-package dev.mariany.datagen;
+package dev.mariany.keep_inventory_nerf.datagen;
 
-import dev.mariany.tag.KeepInventoryNerfTags;
+import dev.mariany.keep_inventory_nerf.tag.KeepInventoryNerfTags;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
 
 import java.util.concurrent.CompletableFuture;
@@ -15,6 +16,6 @@ public class KeepInventoryNerfItemTagProvider extends FabricTagProvider.ItemTagP
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
-        getOrCreateTagBuilder(KeepInventoryNerfTags.Items.IGNORE_DROP);
+        getOrCreateTagBuilder(KeepInventoryNerfTags.Items.IGNORE_DROP).add(Items.RECOVERY_COMPASS);
     }
 }
