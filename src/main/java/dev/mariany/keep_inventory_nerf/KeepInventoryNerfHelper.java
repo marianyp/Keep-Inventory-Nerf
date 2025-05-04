@@ -40,7 +40,7 @@ public class KeepInventoryNerfHelper {
 
         for (ItemStack itemStack : itemsToDrop) {
             player.dropItem(itemStack.copy(), true, false);
-            inventory.remove(stack -> ItemStack.areEqual(itemStack, stack), -1,
+            inventory.remove(stack -> itemStack == stack, -1,
                     player.playerScreenHandler.getCraftingInput());
         }
 
