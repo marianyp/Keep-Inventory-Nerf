@@ -14,7 +14,7 @@ public class ServerPlayerEntityMixin {
     public void injectCopyFrom(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         ServerPlayerEntity newPlayer = (ServerPlayerEntity) (Object) this;
 
-        if (!alive && newPlayer.getServerWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+        if (!alive && newPlayer.getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
             newPlayer.experienceLevel = 0;
             newPlayer.totalExperience = 0;
             newPlayer.experienceProgress = 0;

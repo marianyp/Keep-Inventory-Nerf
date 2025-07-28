@@ -16,6 +16,6 @@ public class KeepInventoryNerfItemTagProvider extends FabricTagProvider.ItemTagP
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup wrapperLookup) {
-        getOrCreateTagBuilder(KeepInventoryNerfTags.Items.IGNORE_DROP).add(Items.RECOVERY_COMPASS);
+        valueLookupBuilder(KeepInventoryNerfTags.Items.IGNORE_DROP).add(Items.RECOVERY_COMPASS);
     }
 }
