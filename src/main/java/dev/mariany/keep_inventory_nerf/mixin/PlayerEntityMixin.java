@@ -30,15 +30,18 @@ public class PlayerEntityMixin {
 
         if (keepInventory) {
             KeepInventoryNerfHelper.vanishCursedItems(player);
+
             List<ItemStack> droppedItems = KeepInventoryNerfHelper.dropRandomItems(player, itemsToDrop);
 
             if (!droppedItems.isEmpty()) {
                 Text itemsText = KeepInventoryNerfHelper.formatItemsText(droppedItems);
 
-                Text message = Text.translatable("death.keep_inventory_nerf.dropped_items",
-                                Text.of(KeepInventoryNerfHelper.formatCoords(player)).copy().withColor(Colors.GRAY))
-                        .withColor(Colors.LIGHT_RED)
-                        .styled(style -> style.withHoverEvent(new HoverEvent.ShowText(itemsText)));
+                Text message = Text.translatable(
+                                           "death.keep_inventory_nerf.dropped_items",
+                                           Text.of(KeepInventoryNerfHelper.formatCoords(player)).copy().withColor(Colors.GRAY)
+                                   )
+                                   .withColor(Colors.LIGHT_RED)
+                                   .styled(style -> style.withHoverEvent(new HoverEvent.ShowText(itemsText)));
 
                 player.sendMessage(message, false);
             }

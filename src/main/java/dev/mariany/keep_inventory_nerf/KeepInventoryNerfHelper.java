@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayList;
@@ -40,8 +39,10 @@ public class KeepInventoryNerfHelper {
 
         for (ItemStack itemStack : itemsToDrop) {
             player.dropItem(itemStack.copy(), true, false);
-            inventory.remove(stack -> itemStack == stack, -1,
-                    player.playerScreenHandler.getCraftingInput());
+            inventory.remove(
+                    stack -> itemStack == stack, -1,
+                    player.playerScreenHandler.getCraftingInput()
+            );
         }
 
         return itemsToDropCopy;
@@ -52,31 +53,25 @@ public class KeepInventoryNerfHelper {
 
         for (int i = 0; i < inventory.size(); i++) {
             ItemStack itemStack = inventory.getStack(i);
-            if (!itemStack.isEmpty() && EnchantmentHelper.hasAnyEnchantmentsWith(itemStack,
-                    EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP)) {
+            if (!itemStack.isEmpty() && EnchantmentHelper.hasAnyEnchantmentsWith(
+                    itemStack,
+                    EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP
+            )) {
                 inventory.removeStack(i);
             }
         }
     }
 
-    public static int getTotalExperienceForLevel(int level) {
-        int xp = 0;
-
-        for (int i = 1; i <= level; ++i) {
-            if (i <= 15) { // Early levels (1–15), low XP scaling
-                xp += 2 * i + 7;
-            } else if (i <= 30) { // Mid levels (16–30), medium XP scaling
-                xp += 5 * i - 38;
-            } else { // High levels (31+), steep XP scaling
-                xp += 9 * i - 158;
-            }
+    public static int convertLevelsToExperience(int level) {
+        if (level <= 16) {
+            return (int) (Math.pow(level, 2) + level * 6);
         }
 
-        return xp;
-    }
+        if (level <= 31) {
+            return (int) (Math.pow(level, 2) * 2.5 - 40.5 * level + 360);
+        }
 
-    public static int getPercentageOfExperience(int totalXP, double percentage) {
-        return MathHelper.floor((double) totalXP * percentage / 100.0D);
+        return (int) (Math.pow(level, 2) * 4.5 - 162.5 * level + 2220);
     }
 
     public static Text formatItemsText(List<ItemStack> itemStacks) {

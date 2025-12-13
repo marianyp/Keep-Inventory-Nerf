@@ -7,12 +7,24 @@ import net.minecraft.world.GameRules;
 
 public class KeepInventoryNerfGamerules {
     public static final GameRules.Key<GameRules.IntRule> KEEP_INVENTORY_MIN_ITEMS_TO_DROP = GameRuleRegistry.register(
-            "keepInventoryMinItemsToDrop", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(1, 0));
+            "keepInventoryMinItemsToDrop",
+            GameRules.Category.PLAYER,
+            GameRuleFactory.createIntRule(1, 0)
+    );
 
     public static final GameRules.Key<GameRules.IntRule> KEEP_INVENTORY_MAX_ITEMS_TO_DROP = GameRuleRegistry.register(
-            "keepInventoryMaxItemsToDrop", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(3, 1));
+            "keepInventoryMaxItemsToDrop",
+            GameRules.Category.PLAYER,
+            GameRuleFactory.createIntRule(3, 1)
+    );
+
+    public static final GameRules.Key<GameRules.IntRule> EXPERIENCE_PERCENTAGE_LOSS = GameRuleRegistry.register(
+            "experiencePercentageLoss",
+            GameRules.Category.PLAYER,
+            GameRuleFactory.createIntRule(33, 0, 100)
+    );
 
     public static void bootstrap() {
-        KeepInventoryNerf.LOGGER.info("Registering gamerules for " + KeepInventoryNerf.MOD_ID);
+        KeepInventoryNerf.LOGGER.info("Registering Gamerules for " + KeepInventoryNerf.MOD_ID);
     }
 }
