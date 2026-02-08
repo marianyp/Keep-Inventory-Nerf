@@ -13,4 +13,4 @@ Keep Inventory is a highly controversial topic in the community. This mod aims t
 
 ## Showcase
 
-<img src="https://github.com/user-attachments/assets/c22d7c64-3b84-4e4a-a5aa-ddb88a6d6805" />
+![](https://github.com/user-attachments/assets/c22d7c64-3b84-4e4a-a5aa-ddb88a6d6805)
