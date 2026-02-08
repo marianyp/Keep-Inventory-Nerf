@@ -1,6 +1,6 @@
 ## Story
 
-Keep Inventory is a highly controversial topic in the community. This mod aims to add balance to the gamerule, allowing players to still face consequences for dying while keeping most of their inventory and experience. This creates a less devastating and more fun gameplay loop. Keep Inventory Nerf draws inspiration from other games like Stardew Valley or Hytale, where dying only results in losing a few random items.  
+Keep Inventory is a highly controversial topic in the community. This mod aims to add balance to the gamerule, allowing players to still face consequences for dying while keeping most of their inventory and levels. This creates a less devastating and more fun gameplay loop. Keep Inventory Nerf draws inspiration from other games like Stardew Valley or Hytale, where dying only results in losing a few random items.  
 
 ## Changes
 
