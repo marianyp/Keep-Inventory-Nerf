@@ -1,4 +1,4 @@
-package dev.mariany.keep_inventory_nerf.mixin;
+package dev.mariany.keepinventorynerf.mixin;
 
 import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Final;

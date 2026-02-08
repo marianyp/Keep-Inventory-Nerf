@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "package": "dev.mariany.keepinventorynerf.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "GameRulesMixin",
+    "PlayerEntityMixin",
+    "ServerPlayerEntityMixin",
+    "accessor.PlayerEntityAccessor"
+  ],
+  "client": [
+    "DeathScreenMixin"
+  ]
+}

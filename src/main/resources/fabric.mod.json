@@ -12,20 +12,23 @@
     "sources": "${mod_git_url}"
   },
   "license": "${mod_license}",
-  "icon": "assets/keep_inventory_nerf/icon.png",
+  "icon": "assets/keepinventorynerf/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "dev.mariany.keep_inventory_nerf.KeepInventoryNerf"
+      "dev.mariany.keepinventorynerf.KeepInventoryNerf"
+    ],
+    "client": [
+      "dev.mariany.keepinventorynerf.client.KeepInventoryNerfClient"
     ],
     "fabric-datagen": [
-      "dev.mariany.keep_inventory_nerf.KeepInventoryNerfDataGenerator"
+      "dev.mariany.keepinventorynerf.KeepInventoryNerfDataGenerator"
     ]
   },
   "mixins": [
-    "keep_inventory_nerf.mixins.json"
+    "keepinventorynerf.mixins.json"
   ],
-  "accessWidener": "keep_inventory_nerf.accesswidener",
+  "accessWidener": "keepinventorynerf.accesswidener",
   "depends": {
     "fabricloader": ">=0.18.1",
     "minecraft": ">=1.21.9",
