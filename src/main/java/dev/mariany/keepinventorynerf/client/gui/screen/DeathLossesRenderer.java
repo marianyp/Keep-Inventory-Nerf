@@ -126,24 +126,33 @@ public class DeathLossesRenderer {
     private void drawDroppedStacks(DrawContext context, @Nullable StackWithSlot stackWithSlot) {
         this.drawDroppedStacksBackground(context);
 
-        this.stacksContainer.forEach((stack, index, x, y) -> {
-            Identifier texture;
+        this.getTextRenderer()
+            .ifPresent(
+                    textRenderer -> this.stacksContainer.forEach(
+                            (stack, index, x, y) -> {
+                                Identifier texture;
 
-            if (stackWithSlot == null || stackWithSlot.slot() != index) {
-                texture = SLOT_TEXTURE;
-            } else {
-                texture = SLOT_FOCUSED_TEXTURE;
-            }
+                                if (stackWithSlot == null || stackWithSlot.slot() != index) {
+                                    texture = SLOT_TEXTURE;
+                                } else {
+                                    texture = SLOT_FOCUSED_TEXTURE;
+                                }
 
-            context.drawGuiTexture(
-                    RenderPipelines.GUI_TEXTURED,
-                    texture,
-                    x, y,
-                    SLOT_SIZE, SLOT_SIZE
+                                context.drawGuiTexture(
+                                        RenderPipelines.GUI_TEXTURED,
+                                        texture,
+                                        x, y,
+                                        SLOT_SIZE, SLOT_SIZE
+                                );
+
+                                int itemX = x + SLOT_INSET;
+                                int itemY = y + SLOT_INSET;
+
+                                context.drawItem(stack, itemX, itemY);
+
+                                context.drawStackOverlay(textRenderer, stack, itemX, itemY);
+                            })
             );
-
-            context.drawItem(stack, x + SLOT_INSET, y + SLOT_INSET);
-        });
     }
 
     private void drawDroppedStacksBackground(DrawContext context) {
