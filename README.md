@@ -13,4 +13,4 @@ Keep Inventory is a highly controversial topic in the community. This mod aims t
 
 ## Showcase
 
-![](https://github.com/user-attachments/assets/c22d7c64-3b84-4e4a-a5aa-ddb88a6d6805)
+![new death screen featuring the items that were dropped and the levels that were lost upon death](https://github.com/user-attachments/assets/c22d7c64-3b84-4e4a-a5aa-ddb88a6d6805)
