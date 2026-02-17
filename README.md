@@ -6,8 +6,8 @@ Keep Inventory is a highly controversial topic in the community. This mod aims t
 
 - Players will only drop between 1 and 3 random items on death. This can be configured with the `keepInventoryMinItemsToDrop` and `keepInventoryMaxItemsToDrop` gamerules.
 - Players will only lose a small percentage of their experience on death. This can be configured with the `experienceLossPercentage` gamerule.
+- On death, you will be informed of which items were dropped and the number of experience levels that were lost.
 - The [Recovery Compass](https://minecraft.wiki/w/Recovery_Compass) will no longer drop from the player's inventory on death.
-- On death, you will be informed of which items were dropped as well as the number of levels that were lost.
 
 **NOTICE**: New worlds will have keep inventory enabled by default. Existing worlds will need to manually enable it.
 
