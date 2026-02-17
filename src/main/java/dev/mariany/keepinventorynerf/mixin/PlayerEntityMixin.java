@@ -16,7 +16,7 @@ public class PlayerEntityMixin {
         PlayerEntity player = (PlayerEntity) (Object) this;
 
         if (player instanceof ServerPlayerEntity serverPlayer) {
-            DeathLossesHandler.tryDrop(serverPlayer);
+            DeathLossesHandler.dropAndNotify(serverPlayer);
         }
     }
 }

@@ -24,20 +24,19 @@ public final class DeathLossesHandler {
     private DeathLossesHandler() {
     }
 
-    public static void tryDrop(ServerPlayerEntity player) {
-        ServerWorld world = player.getEntityWorld();
-        GameRules gameRules = world.getGameRules();
-
-        if (gameRules.getBoolean(GameRules.KEEP_INVENTORY)) {
-            notifyClient(player, dropRandomItems(player));
-        }
+    public static void dropAndNotify(ServerPlayerEntity player) {
+        notifyClient(player, getLostXp(player), dropRandomItems(player));
     }
 
-    private static void notifyClient(ServerPlayerEntity player, List<ItemStack> droppedStacks) {
-        ServerPlayNetworking.send(player, new DeathLossesPacket(getLostXp(player), droppedStacks));
+    private static void notifyClient(ServerPlayerEntity player, int lostXp, List<ItemStack> droppedStacks) {
+        ServerPlayNetworking.send(player, new DeathLossesPacket(lostXp, droppedStacks));
     }
 
     private static int getLostXp(ServerPlayerEntity player) {
+        if (!hasKeepInventory(player)) {
+            return 0;
+        }
+
         int keptXp = ExperienceHandler.getKeptXp(player);
         int newLevel = calculateLevel(keptXp);
         return player.experienceLevel - newLevel;
@@ -95,6 +94,11 @@ public final class DeathLossesHandler {
 
     private static List<ItemStack> dropRandomItems(ServerPlayerEntity player) {
         ServerWorld world = player.getEntityWorld();
+
+        if (!hasKeepInventory(world)) {
+            return List.of();
+        }
+
         return dropRandomItems(player, getRandomDropCount(world));
     }
 
@@ -172,5 +176,13 @@ public final class DeathLossesHandler {
         );
 
         world.spawnEntity(itemEntity);
+    }
+
+    private static boolean hasKeepInventory(ServerPlayerEntity player) {
+        return hasKeepInventory(player.getEntityWorld());
+    }
+
+    private static boolean hasKeepInventory(ServerWorld world) {
+        return world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY);
     }
 }

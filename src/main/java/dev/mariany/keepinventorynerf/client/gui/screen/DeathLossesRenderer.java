@@ -75,8 +75,8 @@ public class DeathLossesRenderer {
             StackWithSlot stackWithSlot = this.getStackAt(mouseX, mouseY).orElse(null);
 
             this.drawLostLevels(context);
-            this.drawDroppedStacks(context, stackWithSlot);
-            this.drawStackTooltip(context, mouseX, mouseY, stackWithSlot);
+            this.drawDroppedStacks(context, mouseX, mouseY, stackWithSlot);
+
             this.updateCursor(context, stackWithSlot != null);
         }
     }
@@ -123,7 +123,11 @@ public class DeathLossesRenderer {
         return Optional.ofNullable(this.client.currentScreen);
     }
 
-    private void drawDroppedStacks(DrawContext context, @Nullable StackWithSlot stackWithSlot) {
+    private void drawDroppedStacks(DrawContext context, int mouseX, int mouseY, @Nullable StackWithSlot stackWithSlot) {
+        if (!this.stacksContainer.hasStacks()) {
+            return;
+        }
+
         this.drawDroppedStacksBackground(context);
 
         this.getTextRenderer()
@@ -153,6 +157,8 @@ public class DeathLossesRenderer {
                                 context.drawStackOverlay(textRenderer, stack, itemX, itemY);
                             })
             );
+
+        this.drawStackTooltip(context, mouseX, mouseY, stackWithSlot);
     }
 
     private void drawDroppedStacksBackground(DrawContext context) {
