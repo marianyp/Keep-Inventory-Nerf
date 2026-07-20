@@ -1,39 +1,34 @@
 package dev.mariany.keepinventorynerf.gamerule;
 
 import dev.mariany.keepinventorynerf.KeepInventoryNerf;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
-import net.minecraft.world.GameRules;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
+import net.minecraft.world.level.gamerules.GameRule;
+import net.minecraft.world.level.gamerules.GameRuleCategory;
 
 public final class KINGamerules {
     private KINGamerules() {
     }
 
-    public static final GameRules.Key<GameRules.IntRule> KEEP_INVENTORY_MIN_ITEMS_TO_DROP = GameRuleRegistry.register(
-            "keepInventoryMinItemsToDrop",
-            GameRules.Category.DROPS,
-            GameRuleFactory.createIntRule(1, 0)
-    );
+    public static final GameRule<Integer> KEEP_INVENTORY_MIN_ITEMS_TO_DROP = GameRuleBuilder.forInteger(1)
+            .minValue(0)
+            .category(GameRuleCategory.DROPS)
+            .buildAndRegister(KeepInventoryNerf.id("keep_inventory_min_items_to_drop"));
 
-    public static final GameRules.Key<GameRules.IntRule> KEEP_INVENTORY_MAX_ITEMS_TO_DROP = GameRuleRegistry.register(
-            "keepInventoryMaxItemsToDrop",
-            GameRules.Category.DROPS,
-            GameRuleFactory.createIntRule(3, 1)
-    );
+    public static final GameRule<Integer> KEEP_INVENTORY_MAX_ITEMS_TO_DROP = GameRuleBuilder.forInteger(3)
+            .minValue(1)
+            .category(GameRuleCategory.DROPS)
+            .buildAndRegister(KeepInventoryNerf.id("keep_inventory_max_items_to_drop"));
 
-    public static final GameRules.Key<GameRules.IntRule> EXPERIENCE_LOSS_PERCENTAGE = GameRuleRegistry.register(
-            "experienceLossPercentage",
-            GameRules.Category.DROPS,
-            GameRuleFactory.createIntRule(33, 0, 100)
-    );
+    public static final GameRule<Integer> EXPERIENCE_LOSS_PERCENTAGE = GameRuleBuilder.forInteger(33)
+            .range(0, 100)
+            .category(GameRuleCategory.DROPS)
+            .buildAndRegister(KeepInventoryNerf.id("experience_loss_percentage"));
 
-    public static final GameRules.Key<GameRules.BooleanRule> DEATH_DROPS_DESPAWN = GameRuleRegistry.register(
-            "deathDropsDespawn",
-            GameRules.Category.DROPS,
-            GameRuleFactory.createBooleanRule(false)
-    );
+    public static final GameRule<Boolean> DEATH_DROPS_DESPAWN = GameRuleBuilder.forBoolean(false)
+            .category(GameRuleCategory.DROPS)
+            .buildAndRegister(KeepInventoryNerf.id("death_drops_despawn"));
 
     public static void bootstrap() {
-        KeepInventoryNerf.bootstrapLog("Gamerules");
+        KeepInventoryNerf.bootstrapLog("Game Rules");
     }
 }

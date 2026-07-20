@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "dev.mariany.keepinventorynerf.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "injectors": {
     "defaultRequire": 1
   },
@@ -13,5 +13,8 @@
   ],
   "client": [
     "DeathScreenMixin"
-  ]
+  ],
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }

@@ -1,31 +1,23 @@
 package dev.mariany.keepinventorynerf.mixin;
 
-import net.minecraft.world.GameRules;
-import org.spongepowered.asm.mixin.Final;
+import net.minecraft.world.level.gamerules.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Map;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(GameRules.class)
 public class GameRulesMixin {
-    @Final
-    @Shadow
-    private static Map<GameRules.Key<?>, GameRules.Type<?>> RULE_TYPES;
-
-    @Inject(method = "register", at = @At("HEAD"), cancellable = true)
-    private static <T extends GameRules.Rule<T>> void onRegister(String name, GameRules.Category category,
-                                                                 GameRules.Type<T> oldType,
-                                                                 CallbackInfoReturnable<GameRules.Key<T>> cir) {
-        if (name.equals("keepInventory")) {
-            GameRules.Key<T> key = new GameRules.Key<>(name, category);
-            GameRules.Type<GameRules.BooleanRule> type = GameRules.BooleanRule.create(true);
-            RULE_TYPES.put(key, type);
-
-            cir.setReturnValue(key);
+    @ModifyArgs(
+            method = "<clinit>",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/gamerules/GameRules;registerBoolean(Ljava/lang/String;Lnet/minecraft/world/level/gamerules/GameRuleCategory;Z)Lnet/minecraft/world/level/gamerules/GameRule;"
+            )
+    )
+    private static void keepinventorynerf$defaultKeepInventory(Args args) {
+        if ("keep_inventory".equals(args.get(0))) {
+            args.set(2, true);
         }
     }
 }

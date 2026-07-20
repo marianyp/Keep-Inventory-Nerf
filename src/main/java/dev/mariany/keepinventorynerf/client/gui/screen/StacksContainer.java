@@ -1,19 +1,22 @@
 package dev.mariany.keepinventorynerf.client.gui.screen;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class StacksContainer {
-    private final MinecraftClient client;
-
-    private final int slotOffset;
+    private final Minecraft client;
+    private final Supplier<Integer> horizontalOffsetSupplier;
     private final int horizontalPadding;
     private final int gap;
     private final int slotSize;
@@ -21,14 +24,14 @@ public class StacksContainer {
     private final List<ItemStack> stacks = new ArrayList<>();
 
     public StacksContainer(
-            MinecraftClient client,
-            int slotOffset,
+            Minecraft client,
+            Supplier<Integer> horizontalOffsetSupplier,
             int horizontalPadding,
             int gap,
             int slotSize
     ) {
         this.client = client;
-        this.slotOffset = slotOffset;
+        this.horizontalOffsetSupplier = horizontalOffsetSupplier;
         this.horizontalPadding = horizontalPadding;
         this.gap = gap;
         this.slotSize = slotSize;
@@ -38,15 +41,15 @@ public class StacksContainer {
         return !this.stacks.isEmpty();
     }
 
-    public Box getBox() {
+    public AABB getBox() {
         if (this.stacks.isEmpty()) {
-            return new Box(0, 0, 0, 0, 0, 0);
+            return new AABB(0, 0, 0, 0, 0, 0);
         }
 
         final int screenWidth = this.getScreenWidth();
 
         if (screenWidth <= 0) {
-            return new Box(0, 0, 0, 0, 0, 0);
+            return new AABB(0, 0, 0, 0, 0, 0);
         }
 
         final int startY = this.getStartY();
@@ -84,9 +87,8 @@ public class StacksContainer {
             row++;
         }
 
-        return new Box(minX, minY, 0, maxX, maxY, 0);
+        return new AABB(minX, minY, 0, maxX, maxY, 0);
     }
-
 
     public void updateStacks(Collection<ItemStack> stacks) {
         this.stacks.clear();
@@ -151,7 +153,7 @@ public class StacksContainer {
     }
 
     private int getStartY() {
-        return this.getScreenHeight() / 4 + this.slotOffset;
+        return this.getScreenHeight() / 4 + this.getHorizontalOffsetSupplier();
     }
 
     private int getScreenWidth() {
@@ -162,8 +164,12 @@ public class StacksContainer {
         return this.getScreen().map(screen -> screen.height).orElse(0);
     }
 
+    private int getHorizontalOffsetSupplier() {
+        return this.horizontalOffsetSupplier.get();
+    }
+
     private Optional<Screen> getScreen() {
-        return Optional.ofNullable(this.client.currentScreen);
+        return Optional.ofNullable(this.client.gui.screen());
     }
 
     @FunctionalInterface

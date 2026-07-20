@@ -14,8 +14,7 @@ public class ClientBoundPackets {
     }
 
     public static void bootstrap() {
-        KeepInventoryNerf.bootstrapLog("Client Bound Packet");
-
+        KeepInventoryNerf.bootstrapLog("Client Bound Packets");
         ClientPlayNetworking.registerGlobalReceiver(DeathLossesPacket.ID, ClientBoundPackets::handleDroppedStacks);
     }
 
