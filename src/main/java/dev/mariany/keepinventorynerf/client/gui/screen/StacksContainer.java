@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @Environment(EnvType.CLIENT)
 public class StacksContainer {
     private final Minecraft client;
-    private final Supplier<Integer> horizontalOffsetSupplier;
+    private final Supplier<Integer> verticalOffsetSupplier;
     private final int horizontalPadding;
     private final int gap;
     private final int slotSize;
@@ -25,13 +25,13 @@ public class StacksContainer {
 
     public StacksContainer(
             Minecraft client,
-            Supplier<Integer> horizontalOffsetSupplier,
+            Supplier<Integer> verticalOffsetSupplier,
             int horizontalPadding,
             int gap,
             int slotSize
     ) {
         this.client = client;
-        this.horizontalOffsetSupplier = horizontalOffsetSupplier;
+        this.verticalOffsetSupplier = verticalOffsetSupplier;
         this.horizontalPadding = horizontalPadding;
         this.gap = gap;
         this.slotSize = slotSize;
@@ -71,7 +71,7 @@ public class StacksContainer {
             int countThisRow = Math.min(maxPerRow, remaining);
 
             int rowWidth = countThisRow * this.slotSize + (countThisRow - 1) * this.gap;
-            int startX = (screenWidth - rowWidth) / 2;
+            int startX = screenWidth / 2 - rowWidth / 2;
 
             int y = startY + row * step;
 
@@ -131,7 +131,7 @@ public class StacksContainer {
             int countThisRow = Math.min(maxPerRow, remaining);
 
             int rowWidth = countThisRow * this.slotSize + (countThisRow - 1) * this.gap;
-            int startX = (screenWidth - rowWidth) / 2;
+            int startX = screenWidth / 2 - rowWidth / 2;
 
             int y = startY + row * step;
 
@@ -153,7 +153,7 @@ public class StacksContainer {
     }
 
     private int getStartY() {
-        return this.getScreenHeight() / 4 + this.getHorizontalOffsetSupplier();
+        return this.getScreenHeight() / 2 + this.getVerticalOffset();
     }
 
     private int getScreenWidth() {
@@ -164,8 +164,8 @@ public class StacksContainer {
         return this.getScreen().map(screen -> screen.height).orElse(0);
     }
 
-    private int getHorizontalOffsetSupplier() {
-        return this.horizontalOffsetSupplier.get();
+    private int getVerticalOffset() {
+        return this.verticalOffsetSupplier.get();
     }
 
     private Optional<Screen> getScreen() {

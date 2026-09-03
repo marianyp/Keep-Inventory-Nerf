@@ -8,6 +8,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,6 +16,7 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -34,6 +36,7 @@ public class DeathLossesRenderer {
     private static final int SLOT_PADDING = 20;
     private static final int SLOT_SIZE = 26;
     private static final int SLOT_INSET = 5;
+    private static final int TEXT_HORIZONTAL_PADDING = 20;
 
     private static final String LEVELS_TRANSLATION_KEY = "deathScreen.keepinventorynerf.lost_levels";
     private static final String STACKS_TRANSLATION_KEY = "deathScreen.keepinventorynerf.lost_stacks";
@@ -54,15 +57,15 @@ public class DeathLossesRenderer {
 
         this.stacksContainer = new StacksContainer(
                 client,
-                DeathLossesRenderer::getHorizontalOffset,
+                DeathLossesRenderer::getItemsVerticalOffset,
                 SLOT_PADDING,
                 SLOT_GAP,
                 SLOT_SIZE
         );
     }
 
-    private static int getHorizontalOffset() {
-        return KeepInventoryNerfClient.getConfig().deathScreen.items.horizontalOffset;
+    private static int getItemsVerticalOffset() {
+        return KeepInventoryNerfClient.getConfig().deathScreen.items.verticalOffset;
     }
 
     public void updateLostLevels(int lostLevels) {
@@ -120,19 +123,44 @@ public class DeathLossesRenderer {
                 Component.literal(Integer.toString(this.lostLevels)).withStyle(ChatFormatting.RED)
         );
 
-        graphics.textRenderer().accept(TextAlignment.CENTER, this.getScreenWidth() / 2, getLevelsTextY(), text);
+        this.drawCenteredWrappedText(graphics, text);
+    }
+
+    private void drawCenteredWrappedText(GuiGraphicsExtractor graphics, Component text) {
+        int maxWidth = Math.max(1, this.getScreenWidth() - TEXT_HORIZONTAL_PADDING * 2);
+        List<FormattedCharSequence> lines = this.client.font.split(text, maxWidth);
+        int centerX = this.getScreenCenterX();
+        int startY = this.getScreenCenterY() + getLevelsVerticalOffset();
+        ActiveTextCollector textRenderer = graphics.textRenderer();
+
+        for (int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
+            textRenderer.accept(
+                    TextAlignment.CENTER,
+                    centerX,
+                    startY + lineIndex * this.client.font.lineHeight,
+                    lines.get(lineIndex)
+            );
+        }
     }
 
     private int getScreenWidth() {
         return this.getScreen().map(screen -> screen.width).orElse(0);
     }
 
+    private int getScreenCenterX() {
+        return this.getScreen().map(screen -> screen.width / 2).orElse(0);
+    }
+
+    private int getScreenCenterY() {
+        return this.getScreen().map(screen -> screen.height / 2).orElse(0);
+    }
+
     private Optional<Screen> getScreen() {
         return Optional.ofNullable(this.client.gui.screen());
     }
 
-    private static int getLevelsTextY() {
-        return KeepInventoryNerfClient.getConfig().deathScreen.levels.textY;
+    private static int getLevelsVerticalOffset() {
+        return KeepInventoryNerfClient.getConfig().deathScreen.levels.verticalOffset;
     }
 
     private void drawDroppedStacks(

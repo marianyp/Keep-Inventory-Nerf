@@ -5,15 +5,15 @@ public class KINClientConfig {
 
     public static class DeathScreenConfig {
         public boolean enabled = true;
-        public ItemsConfig items = new ItemsConfig();
         public LevelsConfig levels = new LevelsConfig();
+        public ItemsConfig items = new ItemsConfig();
 
         public static class LevelsConfig {
-            public int textY = 100;
+            public int verticalOffset = 65;
         }
 
         public static class ItemsConfig {
-            public int horizontalOffset = 146;
+            public int verticalOffset = 88;
         }
     }
 }
