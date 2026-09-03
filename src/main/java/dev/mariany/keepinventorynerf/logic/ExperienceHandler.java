@@ -2,11 +2,11 @@ package dev.mariany.keepinventorynerf.logic;
 
 import com.google.common.math.IntMath;
 import dev.mariany.keepinventorynerf.gamerule.KINGamerules;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.rule.GameRules;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,62 +16,62 @@ public final class ExperienceHandler {
     }
 
     public static void updatePlayerExperience(
-            ServerPlayer oldPlayer,
-            ServerPlayer newPlayer,
+            ServerPlayerEntity oldPlayer,
+            ServerPlayerEntity newPlayer,
             boolean alive
     ) {
         if (alive) {
             return;
         }
 
-        ServerLevel level = newPlayer.level();
-        GameRules gameRules = level.getGameRules();
+        ServerWorld world = newPlayer.getEntityWorld();
+        GameRules gameRules = world.getGameRules();
 
-        if (!gameRules.get(GameRules.KEEP_INVENTORY)) {
+        if (!gameRules.getValue(GameRules.KEEP_INVENTORY)) {
             return;
         }
 
         resetExperience(newPlayer);
-        newPlayer.giveExperiencePoints(getKeptXp(oldPlayer));
+        newPlayer.addExperience(getKeptXp(oldPlayer));
     }
 
-    private static void resetExperience(Player player) {
+    private static void resetExperience(PlayerEntity player) {
         player.experienceLevel = 0;
         player.totalExperience = 0;
         player.experienceProgress = 0;
         player.setScore(0);
     }
 
-    private static int getKeptXp(ServerPlayer player) {
+    private static int getKeptXp(ServerPlayerEntity player) {
         double percentage = (double) getKeptXpPercent(player) / 100;
-        return Mth.floor(getCurrentXp(player) * percentage);
+        return MathHelper.floor(getCurrentXp(player) * percentage);
     }
 
-    private static int getKeptXpPercent(ServerPlayer player) {
-        ServerLevel level = player.level();
-        GameRules gameRules = level.getGameRules();
-        return 100 - gameRules.get(KINGamerules.EXPERIENCE_LOSS_PERCENTAGE);
+    private static int getKeptXpPercent(ServerPlayerEntity player) {
+        ServerWorld world = player.getEntityWorld();
+        GameRules gameRules = world.getGameRules();
+        return 100 - gameRules.getValue(KINGamerules.EXPERIENCE_LOSS_PERCENTAGE);
     }
 
-    private static int getCurrentXp(Player player) {
+    private static int getCurrentXp(PlayerEntity player) {
         int xpAtCurrentLevel = getXpForLevel(player.experienceLevel);
         int xpRequiredForNextLevel = getNextLevelExperience(player.experienceLevel);
-        return xpAtCurrentLevel + Mth.floor(player.experienceProgress * xpRequiredForNextLevel);
+        return xpAtCurrentLevel + MathHelper.floor(player.experienceProgress * xpRequiredForNextLevel);
     }
 
     private static int getXpForLevel(int level) {
         if (level >= 32) {
-            return Mth.floor(4.5 * level * level - 162.5 * level + 2220);
+            return MathHelper.floor(4.5 * level * level - 162.5 * level + 2220);
         }
 
         if (level >= 17) {
-            return Mth.floor(2.5 * level * level - 40.5 * level + 360);
+            return MathHelper.floor(2.5 * level * level - 40.5 * level + 360);
         }
 
         return level * level + 6 * level;
     }
 
-    public static int getKeptLevels(ServerPlayer player) {
+    public static int getKeptLevels(ServerPlayerEntity player) {
         return calculateLevel(getKeptXp(player));
     }
 

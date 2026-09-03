@@ -2,8 +2,8 @@ package dev.mariany.keepinventorynerf.gamerule;
 
 import dev.mariany.keepinventorynerf.KeepInventoryNerf;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
-import net.minecraft.world.level.gamerules.GameRule;
-import net.minecraft.world.level.gamerules.GameRuleCategory;
+import net.minecraft.world.rule.GameRule;
+import net.minecraft.world.rule.GameRuleCategory;
 
 public final class KINGamerules {
     private KINGamerules() {

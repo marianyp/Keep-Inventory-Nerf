@@ -1,25 +1,26 @@
 package dev.mariany.keepinventorynerf.client.gui.screen;
 
-import com.mojang.blaze3d.platform.cursor.CursorTypes;
 import dev.mariany.keepinventorynerf.KeepInventoryNerf;
 import dev.mariany.keepinventorynerf.client.KeepInventoryNerfClient;
 import dev.mariany.keepinventorynerf.config.KINClientConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ActiveTextCollector;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.ItemStackWithSlot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.cursor.StandardCursors;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.inventory.StackWithSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.OrderedText;
+import net.minecraft.util.Colors;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -43,16 +44,16 @@ public class DeathLossesRenderer {
     private static final String LEVELS_AND_STACKS_TRANSLATION_KEY =
             "deathScreen.keepinventorynerf.lost_levels_and_stacks";
 
-    private final Minecraft client;
+    private final MinecraftClient client;
     private final StacksContainer stacksContainer;
 
     private int lostLevels = 0;
 
     public DeathLossesRenderer() {
-        this(Minecraft.getInstance());
+        this(MinecraftClient.getInstance());
     }
 
-    public DeathLossesRenderer(Minecraft client) {
+    public DeathLossesRenderer(MinecraftClient client) {
         this.client = client;
 
         this.stacksContainer = new StacksContainer(
@@ -90,23 +91,23 @@ public class DeathLossesRenderer {
         return this.lostLevels > 0 || this.stacksContainer.hasStacks();
     }
 
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+    public void render(DrawContext context, int mouseX, int mouseY) {
         if (!this.shouldDisplayLosses()) {
             return;
         }
 
-        ItemStackWithSlot stackWithSlot = this.getStackAt(mouseX, mouseY).orElse(null);
+        StackWithSlot stackWithSlot = this.getStackAt(mouseX, mouseY).orElse(null);
 
-        this.drawLostLevels(graphics);
-        this.drawDroppedStacks(graphics, mouseX, mouseY, stackWithSlot);
-        this.updateCursor(graphics, stackWithSlot != null);
+        this.drawLostLevels(context);
+        this.drawDroppedStacks(context, mouseX, mouseY, stackWithSlot);
+        this.updateCursor(context, stackWithSlot != null);
     }
 
-    private void drawLostLevels(GuiGraphicsExtractor graphics) {
+    private void drawLostLevels(DrawContext context) {
+        String translationKey;
+
         boolean lostLevels = this.lostLevels > 0;
         boolean lostStacks = this.stacksContainer.hasStacks();
-
-        String translationKey;
 
         if (lostLevels && lostStacks) {
             translationKey = LEVELS_AND_STACKS_TRANSLATION_KEY;
@@ -118,29 +119,35 @@ public class DeathLossesRenderer {
             return;
         }
 
-        Component text = Component.translatable(
+        Text text = Text.translatable(
                 translationKey,
-                Component.literal(Integer.toString(this.lostLevels)).withStyle(ChatFormatting.RED)
+                Text.literal(Integer.toString(this.lostLevels)).formatted(Formatting.RED)
         );
 
-        this.drawCenteredWrappedText(graphics, text);
+        this.drawCenteredWrappedText(context, text);
     }
 
-    private void drawCenteredWrappedText(GuiGraphicsExtractor graphics, Component text) {
-        int maxWidth = Math.max(1, this.getScreenWidth() - TEXT_HORIZONTAL_PADDING * 2);
-        List<FormattedCharSequence> lines = this.client.font.split(text, maxWidth);
-        int centerX = this.getScreenCenterX();
-        int startY = this.getScreenCenterY() + getLevelsVerticalOffset();
-        ActiveTextCollector textRenderer = graphics.textRenderer();
+    private void drawCenteredWrappedText(DrawContext context, Text text) {
+        this.getTextRenderer().ifPresent(textRenderer -> {
+            int maxWidth = Math.max(1, this.getScreenWidth() - TEXT_HORIZONTAL_PADDING * 2);
+            List<OrderedText> lines = textRenderer.wrapLines(text, maxWidth);
+            int centerX = this.getScreenCenterX();
+            int startY = this.getScreenCenterY() + getLevelsVerticalOffset();
 
-        for (int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
-            textRenderer.accept(
-                    TextAlignment.CENTER,
-                    centerX,
-                    startY + lineIndex * this.client.font.lineHeight,
-                    lines.get(lineIndex)
-            );
-        }
+            for (int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
+                context.drawCenteredTextWithShadow(
+                        textRenderer,
+                        lines.get(lineIndex),
+                        centerX,
+                        startY + lineIndex * textRenderer.fontHeight,
+                        Colors.WHITE
+                );
+            }
+        });
+    }
+
+    private Optional<TextRenderer> getTextRenderer() {
+        return this.getScreen().map(Screen::getTextRenderer);
     }
 
     private int getScreenWidth() {
@@ -156,69 +163,53 @@ public class DeathLossesRenderer {
     }
 
     private Optional<Screen> getScreen() {
-        return Optional.ofNullable(this.client.gui.screen());
+        return Optional.ofNullable(this.client.currentScreen);
     }
 
     private static int getLevelsVerticalOffset() {
         return KeepInventoryNerfClient.getConfig().deathScreen.levels.verticalOffset;
     }
 
-    private void drawDroppedStacks(
-            GuiGraphicsExtractor graphics,
-            int mouseX,
-            int mouseY,
-            @Nullable ItemStackWithSlot highlightedStackWithSlot
-    ) {
+    private void drawDroppedStacks(DrawContext context, int mouseX, int mouseY, @Nullable StackWithSlot stackWithSlot) {
         if (!this.stacksContainer.hasStacks()) {
             return;
         }
 
-        this.drawDroppedStacksBackground(graphics);
+        this.drawDroppedStacksBackground(context);
 
-        this.stacksContainer.forEach((stack, index, x, y) -> this.drawDroppedStack(
-                graphics,
-                highlightedStackWithSlot,
-                stack,
-                index,
-                x,
-                y
-        ));
+        this.getTextRenderer()
+            .ifPresent(
+                    textRenderer -> this.stacksContainer.forEach(
+                            (stack, index, x, y) -> {
+                                Identifier texture;
 
-        this.drawStackTooltip(graphics, mouseX, mouseY, highlightedStackWithSlot);
+                                if (stackWithSlot == null || stackWithSlot.slot() != index) {
+                                    texture = SLOT_TEXTURE;
+                                } else {
+                                    texture = SLOT_HIGHLIGHTED_TEXTURE;
+                                }
+
+                                context.drawGuiTexture(
+                                        RenderPipelines.GUI_TEXTURED,
+                                        texture,
+                                        x, y,
+                                        SLOT_SIZE, SLOT_SIZE
+                                );
+
+                                int itemX = x + SLOT_INSET;
+                                int itemY = y + SLOT_INSET;
+
+                                context.drawItem(stack, itemX, itemY);
+
+                                context.drawStackOverlay(textRenderer, stack, itemX, itemY);
+                            })
+            );
+
+        this.drawStackTooltip(context, mouseX, mouseY, stackWithSlot);
     }
 
-    private void drawDroppedStack(
-            GuiGraphicsExtractor graphics,
-            @Nullable ItemStackWithSlot highlightedStackWithSlot,
-            ItemStack stack,
-            int index,
-            int x,
-            int y
-    ) {
-        Identifier texture;
-
-        if (highlightedStackWithSlot == null || highlightedStackWithSlot.slot() != index) {
-            texture = SLOT_TEXTURE;
-        } else {
-            texture = SLOT_HIGHLIGHTED_TEXTURE;
-        }
-
-        graphics.blitSprite(
-                RenderPipelines.GUI_TEXTURED,
-                texture,
-                x, y,
-                SLOT_SIZE, SLOT_SIZE
-        );
-
-        int itemX = x + SLOT_INSET;
-        int itemY = y + SLOT_INSET;
-
-        graphics.item(stack, itemX, itemY);
-        graphics.itemDecorations(this.client.font, stack, itemX, itemY);
-    }
-
-    private void drawDroppedStacksBackground(GuiGraphicsExtractor graphics) {
-        AABB box = this.getContainerBox();
+    private void drawDroppedStacksBackground(DrawContext context) {
+        Box box = this.getContainerBox();
 
         int minX = (int) box.minX;
         int minY = (int) box.minY;
@@ -226,44 +217,48 @@ public class DeathLossesRenderer {
         int maxX = (int) box.maxX;
         int maxY = (int) box.maxY;
 
-        graphics.fill(minX, minY, maxX, maxY, ARGB.colorFromFloat(0.5F, 0F, 0F, 0F));
+        context.fill(minX, minY, maxX, maxY, ColorHelper.withAlpha(0.5F, Colors.BLACK));
     }
 
-    private AABB getContainerBox() {
-        return this.stacksContainer.getBox().inflate(SLOT_GAP);
+    private Box getContainerBox() {
+        return this.stacksContainer.getBox().expand(SLOT_GAP);
     }
 
-    private void drawStackTooltip(
-            GuiGraphicsExtractor graphics,
-            int x,
-            int y,
-            @Nullable ItemStackWithSlot stackWithSlot
-    ) {
-        if (stackWithSlot == null) {
-            return;
+    private void drawStackTooltip(DrawContext context, int x, int y, @Nullable StackWithSlot stackWithSlot) {
+        if (stackWithSlot != null) {
+            ItemStack stack = stackWithSlot.stack();
+
+            getTextRenderer().ifPresent(textRenderer -> context.drawTooltip(
+                    textRenderer,
+                    this.getTooltipFromItem(stack),
+                    stack.getTooltipData(),
+                    x,
+                    y,
+                    stack.get(DataComponentTypes.TOOLTIP_STYLE)
+            ));
         }
-
-        ItemStack stack = stackWithSlot.stack();
-
-        graphics.setTooltipForNextFrame(this.client.font, stack, x, y);
     }
 
-    private Optional<ItemStackWithSlot> getStackAt(int mouseX, int mouseY) {
-        List<ItemStackWithSlot> stacks = this.stacksContainer.map(
+    private Optional<StackWithSlot> getStackAt(int mouseX, int mouseY) {
+        List<StackWithSlot> stacks = this.stacksContainer.map(
                 (stack, index, x, y) -> {
                     boolean hit = mouseX >= x && mouseX < x + SLOT_SIZE && mouseY >= y && mouseY < y + SLOT_SIZE;
-                    return hit ? new ItemStackWithSlot(index, stack) : null;
+                    return hit ? new StackWithSlot(index, stack) : null;
                 }
         );
 
         return stacks.stream().filter(Objects::nonNull).findFirst();
     }
 
-    private void updateCursor(GuiGraphicsExtractor graphics, boolean hovering) {
+    private List<Text> getTooltipFromItem(ItemStack stack) {
+        return Screen.getTooltipFromItem(this.client, stack);
+    }
+
+    private void updateCursor(DrawContext context, boolean hovering) {
         if (!hovering) {
             return;
         }
 
-        graphics.requestCursor(CursorTypes.POINTING_HAND);
+        context.setCursor(StandardCursors.POINTING_HAND);
     }
 }

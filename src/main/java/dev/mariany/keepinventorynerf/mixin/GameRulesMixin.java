@@ -1,6 +1,6 @@
 package dev.mariany.keepinventorynerf.mixin;
 
-import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.rule.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
@@ -12,7 +12,7 @@ public class GameRulesMixin {
             method = "<clinit>",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/gamerules/GameRules;registerBoolean(Ljava/lang/String;Lnet/minecraft/world/level/gamerules/GameRuleCategory;Z)Lnet/minecraft/world/level/gamerules/GameRule;"
+                    target = "Lnet/minecraft/world/rule/GameRules;registerBooleanRule(Ljava/lang/String;Lnet/minecraft/world/rule/GameRuleCategory;Z)Lnet/minecraft/world/rule/GameRule;"
             )
     )
     private static void keepinventorynerf$defaultKeepInventory(Args args) {

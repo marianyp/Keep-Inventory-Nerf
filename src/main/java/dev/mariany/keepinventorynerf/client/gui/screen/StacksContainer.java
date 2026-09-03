@@ -2,10 +2,10 @@ package dev.mariany.keepinventorynerf.client.gui.screen;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Box;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,8 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class StacksContainer {
-    private final Minecraft client;
+    private final MinecraftClient client;
+
     private final Supplier<Integer> verticalOffsetSupplier;
     private final int horizontalPadding;
     private final int gap;
@@ -24,7 +25,7 @@ public class StacksContainer {
     private final List<ItemStack> stacks = new ArrayList<>();
 
     public StacksContainer(
-            Minecraft client,
+            MinecraftClient client,
             Supplier<Integer> verticalOffsetSupplier,
             int horizontalPadding,
             int gap,
@@ -41,15 +42,15 @@ public class StacksContainer {
         return !this.stacks.isEmpty();
     }
 
-    public AABB getBox() {
+    public Box getBox() {
         if (this.stacks.isEmpty()) {
-            return new AABB(0, 0, 0, 0, 0, 0);
+            return new Box(0, 0, 0, 0, 0, 0);
         }
 
         final int screenWidth = this.getScreenWidth();
 
         if (screenWidth <= 0) {
-            return new AABB(0, 0, 0, 0, 0, 0);
+            return new Box(0, 0, 0, 0, 0, 0);
         }
 
         final int startY = this.getStartY();
@@ -87,8 +88,9 @@ public class StacksContainer {
             row++;
         }
 
-        return new AABB(minX, minY, 0, maxX, maxY, 0);
+        return new Box(minX, minY, 0, maxX, maxY, 0);
     }
+
 
     public void updateStacks(Collection<ItemStack> stacks) {
         this.stacks.clear();
@@ -169,7 +171,7 @@ public class StacksContainer {
     }
 
     private Optional<Screen> getScreen() {
-        return Optional.ofNullable(this.client.gui.screen());
+        return Optional.ofNullable(this.client.currentScreen);
     }
 
     @FunctionalInterface

@@ -5,14 +5,14 @@ import dev.mariany.keepinventorynerf.mixin.accessor.PlayerEntityAccessor;
 import dev.mariany.keepinventorynerf.packet.clientbound.DeathLossesPacket;
 import dev.mariany.keepinventorynerf.tag.KINTags;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.rule.GameRules;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +21,15 @@ public final class DeathLossesHandler {
     private DeathLossesHandler() {
     }
 
-    public static void dropAndNotify(ServerPlayer player) {
+    public static void dropAndNotify(ServerPlayerEntity player) {
         notifyClient(player, getLostLevels(player), dropRandomItems(player));
     }
 
-    private static void notifyClient(ServerPlayer player, int lostXp, List<ItemStack> droppedStacks) {
+    private static void notifyClient(ServerPlayerEntity player, int lostXp, List<ItemStack> droppedStacks) {
         ServerPlayNetworking.send(player, new DeathLossesPacket(lostXp, droppedStacks));
     }
 
-    private static int getLostLevels(ServerPlayer player) {
+    private static int getLostLevels(ServerPlayerEntity player) {
         if (!hasKeepInventory(player)) {
             return 0;
         }
@@ -37,38 +37,38 @@ public final class DeathLossesHandler {
         return player.experienceLevel - ExperienceHandler.getKeptLevels(player);
     }
 
-    private static List<ItemStack> dropRandomItems(ServerPlayer player) {
-        ServerLevel level = player.level();
+    private static List<ItemStack> dropRandomItems(ServerPlayerEntity player) {
+        ServerWorld world = player.getEntityWorld();
 
-        if (!hasKeepInventory(level)) {
+        if (!hasKeepInventory(world)) {
             return List.of();
         }
 
-        return dropRandomItems(player, getRandomDropCount(level));
+        return dropRandomItems(player, getRandomDropCount(world));
     }
 
-    private static int getRandomDropCount(ServerLevel level) {
-        GameRules gameRules = level.getGameRules();
+    private static int getRandomDropCount(ServerWorld world) {
+        GameRules gameRules = world.getGameRules();
 
-        int minItemsToDrop = gameRules.get(KINGamerules.KEEP_INVENTORY_MIN_ITEMS_TO_DROP);
-        int maxItemsToDrop = gameRules.get(KINGamerules.KEEP_INVENTORY_MAX_ITEMS_TO_DROP);
+        int minItemsToDrop = gameRules.getValue(KINGamerules.KEEP_INVENTORY_MIN_ITEMS_TO_DROP);
+        int maxItemsToDrop = gameRules.getValue(KINGamerules.KEEP_INVENTORY_MAX_ITEMS_TO_DROP);
 
-        return level.getRandom().nextIntBetweenInclusive(minItemsToDrop, maxItemsToDrop);
+        return world.getRandom().nextBetween(minItemsToDrop, maxItemsToDrop);
     }
 
-    private static List<ItemStack> dropRandomItems(ServerPlayer player, int dropAmount) {
-        RandomSource random = player.getRandom();
-        Inventory inventory = player.getInventory();
+    private static List<ItemStack> dropRandomItems(ServerPlayerEntity player, int dropAmount) {
+        Random random = player.getRandom();
+        PlayerInventory inventory = player.getInventory();
 
         List<Integer> slotIndexes = new ArrayList<>();
         List<ItemStack> stacks = new ArrayList<>();
 
-        ((PlayerEntityAccessor) player).keepinventorynerf$destroyVanishingCursedItems();
+        ((PlayerEntityAccessor) player).keepinventorynerf$vanishCursedItems();
 
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack itemStack = inventory.getItem(i);
+        for (int i = 0; i < inventory.size(); i++) {
+            ItemStack itemStack = inventory.getStack(i);
 
-            if (!itemStack.isEmpty() && !itemStack.is(KINTags.Items.IGNORE_DROP)) {
+            if (!itemStack.isEmpty() && !itemStack.isIn(KINTags.Items.IGNORE_DROP)) {
                 slotIndexes.add(i);
             }
         }
@@ -80,54 +80,54 @@ public final class DeathLossesHandler {
 
             int slotToRemove = slotIndexes.remove(random.nextInt(slotIndexes.size()));
 
-            ItemStack stack = inventory.getItem(slotToRemove);
+            ItemStack stack = inventory.getStack(slotToRemove);
 
             stacks.add(stack.copy());
 
             dropItem(player, stack.copy());
 
-            inventory.removeItemNoUpdate(slotToRemove);
+            inventory.removeStack(slotToRemove);
         }
 
         return stacks;
     }
 
-    private static void dropItem(ServerPlayer player, ItemStack stack) {
-        ServerLevel level = player.level();
-        GameRules gameRules = level.getGameRules();
-        RandomSource random = level.getRandom();
+    private static void dropItem(ServerPlayerEntity player, ItemStack stack) {
+        ServerWorld world = player.getEntityWorld();
+        GameRules gameRules = world.getGameRules();
+        Random random = world.getRandom();
 
         ItemEntity itemEntity = new ItemEntity(
-                level,
+                world,
                 player.getX(),
                 player.getY(),
                 player.getZ(),
                 stack
         );
 
-        itemEntity.setDefaultPickUpDelay();
+        itemEntity.setToDefaultPickupDelay();
 
-        if (!gameRules.get(KINGamerules.DEATH_DROPS_DESPAWN)) {
-            itemEntity.setUnlimitedLifetime();
+        if (!gameRules.getValue(KINGamerules.DEATH_DROPS_DESPAWN)) {
+            itemEntity.setNeverDespawn();
         }
 
-        float horizontalSpeed = Mth.nextFloat(random, 0, 0.2F);
+        float horizontalSpeed = MathHelper.nextFloat(random, 0, 0.2F);
         float angleRadians = random.nextFloat() * (float) (Math.PI * 2);
 
-        itemEntity.setDeltaMovement(
-                -Mth.sin(angleRadians) * horizontalSpeed,
+        itemEntity.setVelocity(
+                -MathHelper.sin(angleRadians) * horizontalSpeed,
                 0.2F,
-                Mth.cos(angleRadians) * horizontalSpeed
+                MathHelper.cos(angleRadians) * horizontalSpeed
         );
 
-        level.addFreshEntity(itemEntity);
+        world.spawnEntity(itemEntity);
     }
 
-    private static boolean hasKeepInventory(ServerPlayer player) {
-        return hasKeepInventory(player.level());
+    private static boolean hasKeepInventory(ServerPlayerEntity player) {
+        return hasKeepInventory(player.getEntityWorld());
     }
 
-    private static boolean hasKeepInventory(ServerLevel level) {
-        return level.getGameRules().get(GameRules.KEEP_INVENTORY);
+    private static boolean hasKeepInventory(ServerWorld world) {
+        return world.getGameRules().getValue(GameRules.KEEP_INVENTORY);
     }
 }
